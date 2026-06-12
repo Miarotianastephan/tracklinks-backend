@@ -9,7 +9,7 @@ const envFile = process.env.NODE_ENV === 'production'
 require('dotenv').config({
   path: path.resolve(process.cwd(), envFile)
 });
-
+console.log(process.env.NODE_ENV, 'loaded env file:', envFile);
 const required = ['PORT', 'DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET'];
 
 required.forEach((key) => {
