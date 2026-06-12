@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { User, Group, Link } = require('../models');
 const settings = require('../services/settingsService');
+const env = require('../config/env');
 
 const DEFAULT_GROUPS = [
   {
@@ -47,14 +48,14 @@ const DEFAULT_GROUPS = [
 
 async function seed() {
   // Default admin user
-  const adminEmail = process.env.ADMIN_EMAIL || 'def@def.def';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'default';
+  const adminEmail = env.admin.email;
+  const adminPassword = env.admin.password;
   const existingAdmin = await User.findOne({ where: { email: adminEmail } });
   if (!existingAdmin) {
     await User.create({
       name: 'Admin',
       email: adminEmail,
-      passwordHash: await bcrypt.hash(adminPassword, 10),
+      passwordHash: await bcrypt.hash(adminPassword, env.bcryptRounds),
     });
     console.log(`[seed] Created admin user ${adminEmail}`);
   }

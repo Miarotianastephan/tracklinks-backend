@@ -1,15 +1,15 @@
 const nodemailer = require('nodemailer');
 const { AlertEmail } = require('../models');
+const env = require('../config/env');
 
 function buildTransport() {
-  if (!process.env.SMTP_HOST) return null;
-  const port = Number(process.env.SMTP_PORT || 587);
+  if (!env.smtp.host) return null;
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
+    host: env.smtp.host,
+    port: env.smtp.port,
+    secure: env.smtp.port === 465,
+    auth: env.smtp.user
+      ? { user: env.smtp.user, pass: env.smtp.password }
       : undefined,
   });
 }
@@ -37,7 +37,7 @@ async function sendToRecipients(subject, html) {
   }
   try {
     await transport.sendMail({
-      from: process.env.SMTP_FROM || 'Link Status Monitor <no-reply@localhost>',
+      from: env.smtp.from,
       to: recipients.join(', '),
       subject,
       html,
