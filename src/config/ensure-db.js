@@ -10,6 +10,7 @@ async function ensureDatabase() {
     host:     env.db.host,
     port:     env.db.port,
     user:     env.db.user,
+    password: env.db.password,
   });
 
   try {
