@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { Link } = require('../models');
+const { Link, Group } = require('../models');
 const settings = require('./settingsService');
 const mailer = require('./mailer');
 
@@ -7,7 +7,9 @@ let timer = null;
 let checking = false;
 let lastRunAt = null;
 
-async function checkUrl(url, timeoutMs) {
+async function checkUrl(url, timeoutMs, groupId) {
+  const linkGroup = await Group.findByPk(groupId);
+  const isApiLink = linkGroup && linkGroup.key === 'api';
   const startedAt = Date.now();
   try {
     const res = await axios.get(url, {
@@ -16,7 +18,7 @@ async function checkUrl(url, timeoutMs) {
       validateStatus: () => true,
       headers: { 'User-Agent': 'LinkStatusMonitor/1.0 (+https://localhost)' },
     });
-    const ok = res.status < 400;
+    const ok = isApiLink ? (res.status < 500 && res.status != 403) : res.status < 400;
     return {
       status: ok ? 'up' : 'down',
       code: res.status,
@@ -34,7 +36,7 @@ async function checkUrl(url, timeoutMs) {
 }
 
 async function checkOneLink(link, timeoutMs) {
-  const result = await checkUrl(link.url, timeoutMs);
+  const result = await checkUrl(link.url, timeoutMs, link.groupId);
   const previousStatus = link.lastStatus;
   link.lastStatus = result.status;
   link.lastStatusCode = result.code;

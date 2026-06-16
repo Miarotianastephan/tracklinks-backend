@@ -16,7 +16,7 @@ router.get('/status', async (req, res, next) => {
         where: { isActive: true },
         required: false,
       }],
-    });
+  });
     // Sequelize cannot order included rows reliably across dialect versions; sort in JS.
     const payload = groups.map((g) => {
       const json = g.toJSON();
